@@ -1,11 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { IAuth } from '@/interfaces';
-import { SignInType, SignUpType } from '@/types';
+import { IAuth } from 'src/interfaces';
+import { API_URL } from 'src/constants/api';
+import { SignInType, SignUpType } from 'src/types';
 
 export const apiAuth = createApi({
   reducerPath: 'apiAuth',
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.API_URL
+    baseUrl: API_URL
   }),
   keepUnusedDataFor: 20,
   endpoints: builder => ({
@@ -14,18 +15,24 @@ export const apiAuth = createApi({
         url: '/auth/signin',
         method: 'POST',
         body: data
-      })
+      }),
+      transformResponse(data: any) {
+        return data.data;
+      }
     }),
     signUp: builder.mutation<IAuth, SignUpType>({
       query: data => ({
         url: '/auth/signup',
         method: 'POST',
         body: data
-      })
+      }),
+      transformResponse(data: any) {
+        return data.data;
+      }
     }),
     signOut: builder.mutation<void, string>({
       query: userId => ({
-        url: `/auth/${userId}`,
+        url: `/auth/signout/${userId}`,
         method: 'POST'
       })
     })

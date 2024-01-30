@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { IAuth } from '@/interfaces';
+import { IAuth, IUser } from 'src/interfaces';
 
 export const AuthSliceKey = 'auth';
 
@@ -18,16 +18,23 @@ const authSlice = createSlice({
     signIn: (state, action: PayloadAction<IAuth>) => {
       state.authData = action.payload;
     },
+
     signUp: (state, action: PayloadAction<IAuth>) => {
       state.authData = action.payload;
     },
-    signOut: (state, action: PayloadAction<IAuth>) => {
+
+    updateAuth: (state, action: PayloadAction<IUser>) => {
+      if (state.authData != undefined) {
+        state.authData.user = action.payload!;
+      }
+    },
+    signOut: state => {
       state.authData = undefined;
     }
   }
 });
 
-export const { signIn, signUp, signOut } = authSlice.actions;
+export const { signIn, signUp, signOut, updateAuth } = authSlice.actions;
 
 const authReducer = authSlice.reducer;
 export default authReducer;
