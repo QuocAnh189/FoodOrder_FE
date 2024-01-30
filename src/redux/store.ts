@@ -10,17 +10,18 @@ import {
   PURGE,
   REGISTER
 } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+import localStorage from 'redux-persist/es/storage';
 
 //slices
 import authReducer, { AuthSliceKey } from './slices/authSlice';
 
 //api
 import { apiAuth } from './services/authApi';
+import { apiUser } from './services/userApi';
 
 const persistConfig = {
   key: 'root',
-  storage: storage,
+  storage: localStorage,
   whitelist: [AuthSliceKey],
   blacklist: []
 };
@@ -28,7 +29,8 @@ const persistConfig = {
 const combinedReducer = combineReducers({
   [AuthSliceKey]: authReducer,
 
-  [apiAuth.reducerPath]: apiAuth.reducer
+  [apiAuth.reducerPath]: apiAuth.reducer,
+  [apiUser.reducerPath]: apiUser.reducer
 });
 
 const rootReducer = (state: any, action: any) => {
@@ -54,7 +56,8 @@ const store = configureStore({
           PURGE,
           REGISTER,
           'socket/createSocket',
-          'apiAuth/executeMutation/fulfilled'
+          'apiAuth/executeMutation/fulfilled',
+          'apiUser/executeMutation/fulfilled'
         ],
         ignoredActionPaths: [
           'socket.socket',
@@ -76,7 +79,7 @@ const store = configureStore({
           'items.data'
         ]
       }
-    }).concat([apiAuth.middleware])
+    }).concat([apiAuth.middleware, apiUser.middleware])
 });
 
 setupListeners(store.dispatch);
