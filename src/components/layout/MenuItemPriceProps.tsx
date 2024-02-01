@@ -1,93 +1,110 @@
+import { useState } from 'react';
+
+//chakra
+import {
+  Button,
+  Box,
+  Text,
+  FormLabel,
+  Input,
+  FormControl
+} from '@chakra-ui/react';
+
+//components
 import ChevronDown from 'src/components/icons/ChevronDown';
 import ChevronUp from 'src/components/icons/ChevronUp';
 import Plus from 'src/components/icons/Plus';
 import Trash from 'src/components/icons/Trash';
-import { useState } from 'react';
+import { IExtraPrice, IMenuItem } from 'src/interfaces';
+import { UseFormRegister } from 'react-hook-form';
 
-// interface Props {
-//   name:string;
-//   addLabel:string;
-//   props:
-// }
-const MenuItemPriceProps = ({ name, addLabel, props, setProps }: any) => {
-  const [isOpen, setIsOpen] = useState(false);
+interface Props {
+  name: string;
+  addLabel: string;
+  value: IExtraPrice[];
+  add: () => void;
+  remove: any;
+  register: UseFormRegister<IMenuItem>;
+  id: 'sizes' | 'extraIngredientPrices';
+}
 
-  function addProp() {
-    setProps((oldProps: any) => {
-      return [...oldProps, { name: '', price: 0 }];
-    });
-  }
+const MenuItemPriceProps = (props: Props) => {
+  const { name, addLabel, value, add, remove, register, id } = props;
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  function editProp(ev: any, index: any, prop: any) {
-    const newValue = ev.target.value;
-    setProps((prevSizes: any) => {
-      const newSizes = [...prevSizes];
-      newSizes[index][prop] = newValue;
-      return newSizes;
-    });
-  }
+  // function addProp() {
+  //   setProps((oldProps: any) => {
+  //     return [...oldProps, { name: '', price: 0 }];
+  //   });
+  // }
 
-  function removeProp(indexToRemove: any) {
-    setProps((prev: any) =>
-      prev.filter((v: any, index: any) => index !== indexToRemove)
-    );
-  }
+  // function editProp(ev: any, index: any, prop: any) {
+  //   const newValue = ev.target.value;
+  //   setProps((prevSizes: any) => {
+  //     const newSizes = [...prevSizes];
+  //     newSizes[index][prop] = newValue;
+  //     return newSizes;
+  //   });
+  // }
+
+  // function removeProp(indexToRemove: any) {
+  //   setProps((prev: any) =>
+  //     prev.filter((v: any, index: any) => index !== indexToRemove)
+  //   );
+  // }
 
   return (
-    <div className="bg-gray-200 p-2 rounded-md mb-2">
-      <button
+    <Box className="bg-gray-200 p-2 rounded-md mb-2">
+      <Button
         onClick={() => setIsOpen(prev => !prev)}
-        className="inline-flex p-1 border-0 justify-start"
         type="button"
+        display="inline-flex"
+        p={1}
+        justifyContent="flex-start"
       >
         {isOpen && <ChevronUp />}
         {!isOpen && <ChevronDown />}
-        <span>{name}</span>
-        <span>({props?.length})</span>
-      </button>
-      <div className={isOpen ? 'block' : 'hidden'}>
-        {props?.length > 0 &&
-          props.map((size: any, index: any) => (
-            <div key={index} className="flex items-end gap-2">
-              <div>
-                <label>Name</label>
-                <input
+        <Text>{name}</Text>
+        <Text>({value.length})</Text>
+      </Button>
+      <FormControl className={isOpen ? 'block' : 'hidden'}>
+        {value &&
+          value?.length > 0 &&
+          value.map((size: IExtraPrice, index: number) => (
+            <Box key={index} className="flex items-end gap-2">
+              <Box>
+                <FormLabel>Name</FormLabel>
+                <Input
+                  {...register(`${id}.${index}.name`)}
                   type="text"
                   placeholder="Size name"
-                  value={size.name}
-                  onChange={ev => editProp(ev, index, 'name')}
                 />
-              </div>
-              <div>
-                <label>Extra price</label>
-                <input
+              </Box>
+              <Box>
+                <FormLabel>Extra price</FormLabel>
+                <Input
+                  {...register(`${id}.${index}.price`)}
                   type="text"
                   placeholder="Extra price"
-                  value={size.price}
-                  onChange={ev => editProp(ev, index, 'price')}
                 />
-              </div>
-              <div>
-                <button
+              </Box>
+              <Box>
+                <Button
                   type="button"
-                  onClick={() => removeProp(index)}
+                  onClick={() => remove(index)}
                   className="bg-white mb-2 px-2"
                 >
                   <Trash />
-                </button>
-              </div>
-            </div>
+                </Button>
+              </Box>
+            </Box>
           ))}
-        <button
-          type="button"
-          onClick={addProp}
-          className="bg-white items-center"
-        >
+        <Button type="button" onClick={add} className="bg-white items-center">
           <Plus className="w-4 h-4" />
-          <span>{addLabel}</span>
-        </button>
-      </div>
-    </div>
+          <Text>{addLabel}</Text>
+        </Button>
+      </FormControl>
+    </Box>
   );
 };
 

@@ -1,9 +1,9 @@
-import Header from 'src/components/layout/Header';
+//components
 import Hero from 'src/components/layout/Hero';
 import HomeMenu from 'src/components/layout/HomeMenu';
 import SectionHeaders from 'src/components/layout/SectionHeaders';
 
-export default function Home() {
+const Home = () => {
   return (
     <>
       <Hero />
@@ -12,19 +12,21 @@ export default function Home() {
         <SectionHeaders subHeader={'Our story'} mainHeader={'About us'} />
         <div className="text-gray-500 max-w-md mx-auto mt-4 flex flex-col gap-4">
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni
-            minima odit recusandae. Illum ipsa non repudiandae? Eum ipsam iste
-            quos suscipit tempora? Aperiam esse fugiat inventore laboriosam
-            officiis quam rem!
+            The food delivery shop application is a cutting-edge solution
+            designed to revolutionize the way customers experience food delivery
+            services. This user-friendly mobile application seamlessly connects
+            hungry users with a plethora of local restaurants, offering a
+            diverse range of cuisines
           </p>
           <p>
-            At consectetur delectus ducimus est facere iure molestias obcaecati
-            quaerat vitae voluptate? Aspernatur dolor explicabo iste minus
-            molestiae pariatur provident quibusdam saepe?
+            With a sleek and intuitive interface, users can easily browse
+            through a curated selection of restaurants, explore menus, and place
+            orders with just a few taps.
           </p>
           <p>
-            Laborum molestias neque nulla obcaecati odio quia quod reprehenderit
-            sit vitae voluptates? Eos, tenetur.
+            This application aims to enhance convenience, streamline the
+            ordering process, and provide a delightful experience for both
+            customers and restaurant partners.
           </p>
         </div>
       </section>
@@ -38,10 +40,12 @@ export default function Home() {
             className="text-4xl underline text-gray-500"
             href="tel:+46738123123"
           >
-            +46 738 123 123
+            +0702 465 814
           </a>
         </div>
       </section>
     </>
   );
-}
+};
+
+export default Home;

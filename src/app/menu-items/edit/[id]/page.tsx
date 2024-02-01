@@ -1,86 +1,24 @@
 'use client';
+
+//next
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+
+//components
 import DeleteButton from 'src/components/DeleteButton';
 import Left from 'src/components/icons/Left';
 import EditableImage from 'src/components/layout/EditableImage';
 import MenuItemForm from 'src/components/layout/MenuItemForm';
 import UserTabs from 'src/components/layout/UserTabs';
-// import {useProfile} from "src/components/UseProfile";
-import Link from 'next/link';
-import { redirect, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 
-export default function EditMenuItemPage() {
+//toast
+import toast from 'react-hot-toast';
+import { useGetMenuItemQuery } from 'src/redux/services/menuItemApi';
+
+const EditMenuItemPage = () => {
   const { id } = useParams();
 
-  // const [menuItem, setMenuItem] = useState(null);
-  // const [redirectToItems, setRedirectToItems] = useState(false);
-  // const {loading, data} = useProfile();
-
-  // useEffect(() => {
-  //   fetch('/api/menu-items').then(res => {
-  //     res.json().then(items => {
-  //       const item = items.find(i => i._id === id);
-  //       setMenuItem(item);
-  //     });
-  //   })
-  // }, []);
-
-  // async function handleFormSubmit(ev, data) {
-  //   ev.preventDefault();
-  //   data = {...data, _id:id};
-  //   const savingPromise = new Promise(async (resolve, reject) => {
-  //     const response = await fetch('/api/menu-items', {
-  //       method: 'PUT',
-  //       body: JSON.stringify(data),
-  //       headers: { 'Content-Type': 'application/json' },
-  //     });
-  //     if (response.ok)
-  //       resolve();
-  //     else
-  //       reject();
-  //   });
-
-  //   await toast.promise(savingPromise, {
-  //     loading: 'Saving this tasty item',
-  //     success: 'Saved',
-  //     error: 'Error',
-  //   });
-
-  //   setRedirectToItems(true);
-  // }
-
-  // async function handleDeleteClick() {
-  //   const promise = new Promise(async (resolve, reject) => {
-  //     const res = await fetch('/api/menu-items?_id='+id, {
-  //       method: 'DELETE',
-  //     });
-  //     if (res.ok)
-  //       resolve();
-  //     else
-  //       reject();
-  //   });
-
-  //   await toast.promise(promise, {
-  //     loading: 'Deleting...',
-  //     success: 'Deleted',
-  //     error: 'Error',
-  //   });
-
-  //   setRedirectToItems(true);
-  // }
-
-  // if (redirectToItems) {
-  //   return redirect('/menu-items');
-  // }
-
-  // if (loading) {
-  //   return 'Loading user info...';
-  // }
-
-  // if (!data.admin) {
-  //   return 'Not an admin.';
-  // }
+  const { data: menuItem } = useGetMenuItemQuery(id);
 
   return (
     <section className="mt-8">
@@ -91,12 +29,9 @@ export default function EditMenuItemPage() {
           <span>Show all menu items</span>
         </Link>
       </div>
-      <MenuItemForm menuItem={null} onSubmit={() => {}} />
-      <div className="max-w-md mx-auto mt-2">
-        <div className="max-w-xs ml-auto pl-4">
-          <DeleteButton label="Delete this menu item" onDelete={() => {}} />
-        </div>
-      </div>
+      {menuItem && <MenuItemForm menuItem={menuItem} onSubmit={() => {}} />}
     </section>
   );
-}
+};
+
+export default EditMenuItemPage;

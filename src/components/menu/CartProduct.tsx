@@ -1,10 +1,10 @@
-// import { cartProductPrice } from '@/components/AppContext';
+import { cartProductPrice } from 'src/components/AppContext';
 import Trash from 'src/components/icons/Trash';
 import Image from 'next/image';
 
 interface Props {
   product: any;
-  onRemove?: any;
+  onRemove?: () => void;
 }
 const CartProduct = (props: Props) => {
   const { product, onRemove } = props;
@@ -30,11 +30,10 @@ const CartProduct = (props: Props) => {
           </div>
         )}
       </div>
-      {/* <div className="text-lg font-semibold">${cartProductPrice(product)}</div> */}
+      <div className="text-lg font-semibold">${cartProductPrice(product)}</div>
       {!!onRemove && (
         <div className="ml-2">
-          {/* <button type="button" onClick={() => onRemove(index)} className="p-2"> */}
-          <button type="button" className="p-2">
+          <button type="button" className="p-2" onClick={onRemove}>
             <Trash />
           </button>
         </div>

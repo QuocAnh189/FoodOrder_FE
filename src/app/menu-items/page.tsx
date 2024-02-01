@@ -1,6 +1,9 @@
 'use client';
 import { useState } from 'react';
 
+//chakra
+import { Text, Box } from '@chakra-ui/react';
+
 //components
 import Right from 'src/components/icons/Right';
 import UserTabs from 'src/components/layout/UserTabs';
@@ -9,58 +12,51 @@ import UserTabs from 'src/components/layout/UserTabs';
 import Image from 'next/image';
 import Link from 'next/link';
 
+//redux
+import { useGetMenuItemsQuery } from 'src/redux/services/menuItemApi';
+import { IMenuItem } from 'src/interfaces';
+
 const MenuItemsPage = () => {
-  const [menuItems, setMenuItems] = useState([]);
-
-  // useEffect(() => {
-  //   fetch('/api/menu-items').then(res => {
-  //     res.json().then(menuItems => {
-  //       setMenuItems(menuItems);
-  //     });
-  //   })
-  // }, []);
-
-  // if (loading) {
-  //   return 'Loading user info...';
-  // }
-
-  // if (!data.admin) {
-  //   return 'Not an admin.';
-  // }
+  const { data: menuItems } = useGetMenuItemsQuery();
 
   return (
     <section className="mt-8 max-w-2xl mx-auto">
       <UserTabs isAdmin={true} />
-      <div className="mt-8">
+      <Box className="mt-8">
         <Link className="button flex" href={'/menu-items/new'}>
-          <span>Crete new menu item</span>
+          <Text>Crete new menu item</Text>
           <Right />
         </Link>
-      </div>
-      <div>
-        <h2 className="text-sm text-gray-500 mt-8">Edit menu item:</h2>
-        <div className="grid grid-cols-3 gap-2">
-          {menuItems?.length > 0 &&
-            menuItems.map((item: any) => (
+      </Box>
+      <Box>
+        <Text className="text-sm text-gray-500 mt-8">Edit menu item:</Text>
+        <Box className="grid grid-cols-3 gap-2">
+          {menuItems &&
+            menuItems?.length > 0 &&
+            menuItems.map((item: IMenuItem) => (
               <Link
                 key={item._id}
                 href={'/menu-items/edit/' + item._id}
                 className="bg-gray-200 rounded-lg p-4"
               >
-                <div className="relative">
+                <Box className="relative">
                   <Image
-                    className="rounded-md"
-                    src={item.image}
+                    className="rounded-md h-[180px] w-[200px] object-cover"
+                    src={
+                      item.image
+                        ? item.image
+                        : 'https://res.cloudinary.com/dadvtny30/image/upload/v1706669140/foodorder/menuitem/gz16qwknqddqqvvnontw.jpg'
+                    }
                     alt={''}
                     width={200}
                     height={200}
                   />
-                </div>
-                <div className="text-center">{item.name}</div>
+                </Box>
+                <Box className="text-center mt-2">{item.name}</Box>
               </Link>
             ))}
-        </div>
-      </div>
+        </Box>
+      </Box>
     </section>
   );
 };

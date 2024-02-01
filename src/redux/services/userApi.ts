@@ -10,14 +10,14 @@ export const apiUser = createApi({
   tagTypes: ['User', 'Infor'],
   keepUnusedDataFor: 20,
   endpoints: builder => ({
-    getUser: builder.query<IUser, string>({
+    getUser: builder.query<IUser, string | string[]>({
       query: userId => ({
         url: `/user/${userId}`,
         method: 'GET'
       }),
       providesTags: ['User']
     }),
-    getUsers: builder.query<IUser, void>({
+    getUsers: builder.query<IUser[], void>({
       query: () => ({
         url: `/user`,
         method: 'GET'

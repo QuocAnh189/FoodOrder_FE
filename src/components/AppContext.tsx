@@ -1,4 +1,7 @@
 'use client';
+
+//charkra-ui
+import { ChakraProvider } from '@chakra-ui/react';
 import { createContext, useEffect, useState } from 'react';
 
 //toast
@@ -70,19 +73,21 @@ const AppProvider = ({
   }
 
   return (
-    <Provider store={store}>
-      <CartContext.Provider
-        value={{
-          cartProducts,
-          setCartProducts,
-          addToCart,
-          removeCartProduct,
-          clearCart
-        }}
-      >
-        {children}
-      </CartContext.Provider>
-    </Provider>
+    <ChakraProvider>
+      <Provider store={store}>
+        <CartContext.Provider
+          value={{
+            cartProducts,
+            setCartProducts,
+            addToCart,
+            removeCartProduct,
+            clearCart
+          }}
+        >
+          {children}
+        </CartContext.Provider>
+      </Provider>
+    </ChakraProvider>
   );
 };
 

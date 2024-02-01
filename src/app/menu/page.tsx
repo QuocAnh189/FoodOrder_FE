@@ -1,39 +1,40 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 //components
 import SectionHeaders from 'src/components/layout/SectionHeaders';
 import MenuItem from 'src/components/menu/MenuItem';
+import { ICategory, IMenuItem } from 'src/interfaces';
 
-export default function MenuPage() {
-  const [categories, setCategories] = useState([]);
-  const [menuItems, setMenuItems] = useState([]);
-  // useEffect(() => {
-  //   fetch('/api/categories').then(res => {
-  //     res.json().then(categories => setCategories(categories))
-  //   });
-  //   fetch('/api/menu-items').then(res => {
-  //     res.json().then(menuItems => setMenuItems(menuItems));
-  //   });
-  // }, []);
+//redux
+import { useGetCategoriesQuery } from 'src/redux/services/categoryApi';
+import { useGetMenuItemsQuery } from 'src/redux/services/menuItemApi';
+
+const MenuPage = () => {
+  const { data: categories } = useGetCategoriesQuery();
+  const { data: menuItems } = useGetMenuItemsQuery();
 
   return (
     <section className="mt-8">
-      {categories?.length > 0 &&
-        categories.map((c: any) => (
-          <div key={c._id}>
+      {categories &&
+        categories?.length > 0 &&
+        categories.map((category: ICategory) => (
+          <div key={category._id}>
             <div className="text-center">
-              <SectionHeaders mainHeader={c.name} />
+              <SectionHeaders mainHeader={category.name} />
             </div>
             <div className="grid sm:grid-cols-3 gap-4 mt-6 mb-12">
-              {menuItems
-                .filter((item: any) => item.category === c._id)
-                .map((item: any) => (
-                  <MenuItem key={item._id} {...item} />
-                ))}
+              {menuItems &&
+                menuItems
+                  .filter((item: IMenuItem) => item.category === category._id)
+                  .map((item: IMenuItem) => (
+                    <MenuItem key={item._id} menuItem={item} />
+                  ))}
             </div>
           </div>
         ))}
     </section>
   );
-}
+};
+
+export default MenuPage;

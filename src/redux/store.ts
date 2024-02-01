@@ -18,6 +18,8 @@ import authReducer, { AuthSliceKey } from './slices/authSlice';
 //api
 import { apiAuth } from './services/authApi';
 import { apiUser } from './services/userApi';
+import { apiCategory } from './services/categoryApi';
+import { apiMenuItem } from './services/menuItemApi';
 
 const persistConfig = {
   key: 'root',
@@ -30,7 +32,9 @@ const combinedReducer = combineReducers({
   [AuthSliceKey]: authReducer,
 
   [apiAuth.reducerPath]: apiAuth.reducer,
-  [apiUser.reducerPath]: apiUser.reducer
+  [apiUser.reducerPath]: apiUser.reducer,
+  [apiCategory.reducerPath]: apiCategory.reducer,
+  [apiMenuItem.reducerPath]: apiMenuItem.reducer
 });
 
 const rootReducer = (state: any, action: any) => {
@@ -79,7 +83,12 @@ const store = configureStore({
           'items.data'
         ]
       }
-    }).concat([apiAuth.middleware, apiUser.middleware])
+    }).concat([
+      apiAuth.middleware,
+      apiUser.middleware,
+      apiCategory.middleware,
+      apiMenuItem.middleware
+    ])
 });
 
 setupListeners(store.dispatch);
