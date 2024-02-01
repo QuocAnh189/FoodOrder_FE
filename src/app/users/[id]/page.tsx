@@ -1,58 +1,27 @@
 'use client';
+
+import { useEffect, useState } from 'react';
+
+//next
+import { useParams } from 'next/navigation';
+
+//components
 import UserForm from 'src/components/layout/UserForm';
 import UserTabs from 'src/components/layout/UserTabs';
-// import {useProfile} from "src/components/UseProfile";
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 
-export default function EditUserPage() {
-  // const {loading, data} = useProfile();
-  const [user, setUser] = useState(null);
+//redux
+import { useGetUserQuery } from 'src/redux/services/userApi';
+
+const EditUserPage = () => {
   const { id } = useParams();
-
-  useEffect(() => {
-    fetch('/api/profile?_id=' + id).then(res => {
-      res.json().then(user => {
-        setUser(user);
-      });
-    });
-  }, []);
-
-  async function handleSaveButtonClick(ev: any, data: any) {
-    // ev.preventDefault();
-    // const promise = new Promise(async (resolve, reject) => {
-    //   const res = await fetch('/api/profile', {
-    //     method: 'PUT',
-    //     headers: {'Content-Type': 'application/json'},
-    //     body: JSON.stringify({...data,_id:id}),
-    //   });
-    //   if (res.ok)
-    //     resolve();
-    //   else
-    //     reject();
-    // });
-    // await toast.promise(promise, {
-    //   loading: 'Saving user...',
-    //   success: 'User saved',
-    //   error: 'An error has occurred while saving the user',
-    // });
-  }
-
-  // if (loading) {
-  //   return 'Loading user profile...';
-  // }
-
-  // if (!data.admin) {
-  //   return 'Not an admin';
-  // }
+  const { data: user } = useGetUserQuery(id);
 
   return (
     <section className="mt-8 mx-auto max-w-2xl">
       <UserTabs isAdmin={true} />
-      <div className="mt-8">
-        <UserForm user={user} onSave={handleSaveButtonClick} />
-      </div>
+      <div className="mt-8">{user && <UserForm user={user!} />}</div>
     </section>
   );
-}
+};
+
+export default EditUserPage;

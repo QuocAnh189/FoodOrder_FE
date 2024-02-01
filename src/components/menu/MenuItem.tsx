@@ -1,23 +1,34 @@
+'use client';
+
+import { useContext, useState } from 'react';
+import { Box } from '@chakra-ui/react';
+
+//components
 import { CartContext } from 'src/components/AppContext';
 import MenuItemTile from 'src/components/menu/MenuItemTile';
+
+//next
 import Image from 'next/image';
-import { useContext, useState } from 'react';
+
 // import FlyingButton from "react-flying-item";
-import toast from 'react-hot-toast';
+//interface
+import { IExtraPrice, IMenuItem } from 'src/interfaces';
 
 interface Props {
-  menuItem: any;
+  menuItem: IMenuItem;
 }
+
 const MenuItem = (props: Props) => {
   const { menuItem } = props;
   const { image, name, description, basePrice, sizes, extraIngredientPrices } =
     menuItem;
+
   const [selectedSize, setSelectedSize] = useState(sizes?.[0] || null);
-  const [selectedExtras, setSelectedExtras] = useState<any>([]);
+  const [selectedExtras, setSelectedExtras] = useState<IExtraPrice[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const { addToCart }: any = useContext(CartContext);
 
-  async function handleAddToCartButtonClick() {
+  const handleAddToCartButtonClick = async () => {
     console.log('add to cart');
     const hasOptions = sizes.length > 0 || extraIngredientPrices.length > 0;
     if (hasOptions && !showPopup) {
@@ -28,19 +39,20 @@ const MenuItem = (props: Props) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     console.log('hiding popup');
     setShowPopup(false);
-  }
-  function handleExtraThingClick(ev: any, extraThing: any) {
+  };
+
+  const handleExtraThingClick = (ev: any, extraThing: IExtraPrice) => {
     const checked = ev.target.checked;
     if (checked) {
-      setSelectedExtras((prev: any) => [...prev, extraThing]);
+      setSelectedExtras(prev => [...prev, extraThing]);
     } else {
-      setSelectedExtras((prev: any) => {
-        return prev.filter((e: any) => e.name !== extraThing.name);
+      setSelectedExtras(prev => {
+        return prev.filter((e: IExtraPrice) => e.name !== extraThing.name);
       });
     }
-  }
+  };
 
-  let selectedPrice = basePrice;
+  let selectedPrice = basePrice!;
   if (selectedSize) {
     selectedPrice += selectedSize.price;
   }
@@ -59,15 +71,15 @@ const MenuItem = (props: Props) => {
         >
           <div
             onClick={ev => ev.stopPropagation()}
-            className="my-8 bg-white p-2 rounded-lg max-w-md"
+            className="my-8 bg-white p-2 rounded-lg w-2/5"
           >
             <div
               className="overflow-y-scroll p-2"
               style={{ maxHeight: 'calc(100vh - 100px)' }}
             >
               <Image
-                src={image}
-                alt={name}
+                src={image!}
+                alt={name!}
                 width={300}
                 height={200}
                 className="mx-auto"
@@ -79,7 +91,7 @@ const MenuItem = (props: Props) => {
               {sizes?.length > 0 && (
                 <div className="py-2">
                   <h3 className="text-center text-gray-700">Pick your size</h3>
-                  {sizes.map((size: any) => (
+                  {sizes.map((size: IExtraPrice) => (
                     <label
                       key={size._id}
                       className="flex items-center gap-2 p-4 border rounded-md mb-1"
@@ -90,7 +102,7 @@ const MenuItem = (props: Props) => {
                         checked={selectedSize?.name === size.name}
                         name="size"
                       />
-                      {size.name} ${basePrice + size.price}
+                      {size.name} ${basePrice! + size.price}
                     </label>
                   ))}
                 </div>
@@ -98,7 +110,7 @@ const MenuItem = (props: Props) => {
               {extraIngredientPrices?.length > 0 && (
                 <div className="py-2">
                   <h3 className="text-center text-gray-700">Any extras?</h3>
-                  {extraIngredientPrices.map((extraThing: any) => (
+                  {extraIngredientPrices.map((extraThing: IExtraPrice) => (
                     <label
                       key={extraThing._id}
                       className="flex items-center gap-2 p-4 border rounded-md mb-1"
@@ -107,7 +119,7 @@ const MenuItem = (props: Props) => {
                         type="checkbox"
                         onChange={ev => handleExtraThingClick(ev, extraThing)}
                         checked={selectedExtras
-                          .map((e: any) => e?._id)
+                          .map((e: IExtraPrice) => e?._id)
                           .includes(extraThing._id)}
                         name={extraThing.name}
                       />
@@ -120,21 +132,26 @@ const MenuItem = (props: Props) => {
                 targetTop={'5%'}
                 targetLeft={'95%'}
                 src={image}> */}
-              <div
-                className="primary sticky bottom-2"
+
+              <button
+                type="button"
                 onClick={handleAddToCartButtonClick}
+                className="mt-4 bg-primary text-white rounded-full px-8 py-2"
               >
                 Add to cart ${selectedPrice}
-              </div>
+              </button>
               {/* </FlyingButton> */}
-              <button className="mt-2" onClick={() => setShowPopup(false)}>
+              <button className="mt-2 py-2" onClick={() => setShowPopup(false)}>
                 Cancel
               </button>
             </div>
           </div>
         </div>
       )}
-      <MenuItemTile onAddToCart={handleAddToCartButtonClick} {...menuItem} />
+      <MenuItemTile
+        onAddToCart={() => setShowPopup(true)}
+        menuItem={menuItem}
+      />
     </>
   );
 };

@@ -1,53 +1,58 @@
 'use client';
-import UserTabs from 'src/components/layout/UserTabs';
-// import {useProfile} from "src/components/UseProfile";
+import { useState } from 'react';
+
+//chakra
+import { Avatar, Box, Flex, Stack, Text } from '@chakra-ui/react';
+
+//next
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+
+//components
+import UserTabs from 'src/components/layout/UserTabs';
+
+//redux
+import { useGetUsersQuery } from 'src/redux/services/userApi';
+import { useAppSelector } from 'src/redux/hooks';
+import { IUser } from 'src/interfaces';
+
+interface ItemsUserProps {
+  user: IUser;
+}
+const ItemUser = (props: ItemsUserProps) => {
+  const { user } = props;
+  return (
+    <Flex
+      key={user._id}
+      className="bg-gray-100 rounded-lg mb-2 p-1 px-4 items-center gap-4 justify-between"
+    >
+      <Flex className="items-center gap-2">
+        <Avatar src={user.avatar} />
+        <Stack className="text-gray-900">{<Text>{user.name}</Text>}</Stack>
+      </Flex>
+      <Box>
+        <Text className="text-gray-500">{user.email}</Text>
+      </Box>
+      <Box>
+        <Link className="button" href={'/users/' + user._id}>
+          Edit
+        </Link>
+      </Box>
+    </Flex>
+  );
+};
 
 const UsersPage = () => {
-  const [users, setUsers] = useState([]);
-  // const {loading,data} = useProfile();
+  const userinfo = useAppSelector(state => state.auth.authData?.user.info);
 
-  // useEffect(() => {
-  //   fetch('/api/users').then(response => {
-  //     response.json().then(users => {
-  //       setUsers(users);
-  //     });
-  //   })
-  // }, []);
-
-  // if (loading) {
-  //   return 'Loading user info...';
-  // }
-
-  // if (!data.admin) {
-  //   return 'Not an admin';
-  // }
+  const { data: users, isLoading } = useGetUsersQuery();
 
   return (
     <section className="max-w-2xl mx-auto mt-8">
-      <UserTabs isAdmin={true} />
+      <UserTabs isAdmin={userinfo?.role === 'ADMIN'} />
       <div className="mt-8">
-        {users?.length > 0 &&
-          users.map((user: any) => (
-            <div
-              key={user._id}
-              className="bg-gray-100 rounded-lg mb-2 p-1 px-4 flex items-center gap-4"
-            >
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 grow">
-                <div className="text-gray-900">
-                  {!!user.name && <span>{user.name}</span>}
-                  {!user.name && <span className="italic">No name</span>}
-                </div>
-                <span className="text-gray-500">{user.email}</span>
-              </div>
-              <div>
-                <Link className="button" href={'/users/' + user._id}>
-                  Edit
-                </Link>
-              </div>
-            </div>
-          ))}
+        {users &&
+          users?.length > 0 &&
+          users.map((user: IUser) => <ItemUser user={user} />)}
       </div>
     </section>
   );

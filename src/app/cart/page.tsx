@@ -1,6 +1,9 @@
 'use client';
 import { useContext, useEffect, useState } from 'react';
 
+//chakra-ui
+import { Box, Button, FormControl, Grid, Text } from '@chakra-ui/react';
+
 //components
 import { CartContext, cartProductPrice } from 'src/components/AppContext';
 import Trash from 'src/components/icons/Trash';
@@ -13,9 +16,11 @@ import CartProduct from 'src/components/menu/CartProduct';
 //toast
 import toast from 'react-hot-toast';
 
-export default function CartPage() {
-  // const {cartProducts,removeCartProduct} = useContext(CartContext);
-  const cartProducts: any = [];
+//redux
+import { useAppSelector } from 'src/redux/hooks';
+
+const CartPage = () => {
+  const { cartProducts, removeCartProduct }: any = useContext(CartContext);
   const [address, setAddress] = useState({});
 
   useEffect(() => {
@@ -26,28 +31,17 @@ export default function CartPage() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   if (profileData?.city) {
-  //     const {phone, streetAddress, city, postalCode, country} = profileData;
-  //     const addressFromProfile = {
-  //       phone,
-  //       streetAddress,
-  //       city,
-  //       postalCode,
-  //       country
-  //     };
-  //     setAddress(addressFromProfile);
-  //   }
-  // }, [profileData]);
+  const user = useAppSelector(state => state.auth.authData?.user);
 
   let subtotal = 0;
   for (const p of cartProducts) {
     subtotal += cartProductPrice(p);
   }
-  function handleAddressChange(propName: any, value: any) {
+
+  const handleAddressChange = (propName: any, value: any) => {
     setAddress(prevAddress => ({ ...prevAddress, [propName]: value }));
-  }
-  async function proceedToCheckout(ev: any) {
+  };
+  const proceedToCheckout = async (ev: any) => {
     ev.preventDefault();
     // address and shopping cart products
 
@@ -74,7 +68,7 @@ export default function CartPage() {
       success: 'Redirecting to payment...',
       error: 'Something went wrong... Please try again later'
     });
-  }
+  };
 
   if (cartProducts?.length === 0) {
     return (
@@ -87,50 +81,51 @@ export default function CartPage() {
 
   return (
     <section className="mt-8">
-      <div className="text-center">
+      <Box className="text-center">
         <SectionHeaders mainHeader="Cart" />
-      </div>
-      <div className="mt-8 grid gap-8 grid-cols-2">
-        <div>
+      </Box>
+      <Grid className="mt-8 grid gap-8 grid-cols-2">
+        <Box>
           {cartProducts?.length === 0 && (
-            <div>No products in your shopping cart</div>
+            <Text>No products in your shopping cart</Text>
           )}
           {cartProducts?.length > 0 &&
-            cartProducts.map((product: any, index: any) => (
-              <CartProduct key={index} product={product} onRemove={() => {}} />
+            cartProducts.map((product: any, index: number) => (
+              <CartProduct
+                key={index}
+                product={product}
+                onRemove={() => removeCartProduct(index)}
+              />
             ))}
-          <div className="py-2 pr-16 flex justify-end items-center">
-            <div className="text-gray-500">
-              Subtotal:
+          <Box className="py-2 pr-16 flex justify-end items-center">
+            <Box className="text-gray-500">
+              <Text>Subtotal:</Text>
               <br />
-              Delivery:
+              <Text> Delivery:</Text>
               <br />
               Total:
-            </div>
-            <div className="font-semibold pl-2 text-right">
-              ${subtotal}
+            </Box>
+            <Box className="font-semibold pl-2 text-right">
+              <Text>${subtotal}</Text>
               <br />
-              $5
-              <br />${subtotal + 5}
-            </div>
-          </div>
-        </div>
-        <div className="bg-gray-100 p-4 rounded-lg">
-          <h2>Checkout</h2>
-          <form onSubmit={proceedToCheckout}>
-            <AddressInputs
-              phone="0702465814"
-              streetAddress="O dau ke me tao"
-              postalCode="123456"
-              city="Thu Duc City"
-              country="VietNam"
-              setAddressProp={handleAddressChange}
-              disabled={false}
-            />
-            <button type="submit">Pay ${subtotal + 5}</button>
-          </form>
-        </div>
-      </div>
+              <Text>$5</Text>
+              <br />
+              <Text>${subtotal + 5}</Text>
+            </Box>
+          </Box>
+        </Box>
+        <Box className="bg-gray-100 p-4 rounded-lg">
+          <Text>Checkout</Text>
+          <FormControl as="form" onSubmit={proceedToCheckout}>
+            <AddressInputs info={user?.info!} />
+            <Button mt={2} type="submit">
+              Pay ${subtotal + 5}
+            </Button>
+          </FormControl>
+        </Box>
+      </Grid>
     </section>
   );
-}
+};
+
+export default CartPage;

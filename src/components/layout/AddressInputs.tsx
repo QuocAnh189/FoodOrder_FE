@@ -165,7 +165,7 @@ const AddressInputs = (props: Props) => {
 
       <Button as="button" disabled={isLoading} type="submit">
         {isLoading ? (
-          <CircularProgress isIndeterminate color="white" size={24} />
+          <CircularProgress isIndeterminate color="white" size="24px" />
         ) : (
           <Text>Save</Text>
         )}

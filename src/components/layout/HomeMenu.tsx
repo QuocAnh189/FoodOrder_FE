@@ -1,18 +1,18 @@
 'use client';
+import { useState } from 'react';
+
+//components
 import SectionHeaders from 'src/components/layout/SectionHeaders';
 import MenuItem from 'src/components/menu/MenuItem';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+
+//redux
+import { useGetMenuItemsQuery } from 'src/redux/services/menuItemApi';
+import { IMenuItem } from 'src/interfaces';
 
 const HomeMenu = () => {
-  const [bestSellers, setBestSellers] = useState([]);
-  useEffect(() => {
-    fetch('/api/menu-items').then(res => {
-      res.json().then(menuItems => {
-        setBestSellers(menuItems.slice(-3));
-      });
-    });
-  }, []);
+  const { data: bestSellers } = useGetMenuItemsQuery();
+
   return (
     <section className="">
       <div className="absolute left-0 right-0 w-full justify-start">
@@ -30,10 +30,13 @@ const HomeMenu = () => {
         />
       </div>
       <div className="grid sm:grid-cols-3 gap-4">
-        {bestSellers?.length > 0 &&
-          bestSellers.map((item: any) => (
-            <MenuItem key={item._id} menuItem={item} />
-          ))}
+        {bestSellers &&
+          bestSellers?.length > 0 &&
+          bestSellers
+            .slice(-3)
+            .map((item: IMenuItem) => (
+              <MenuItem key={item._id} menuItem={item} />
+            ))}
       </div>
     </section>
   );

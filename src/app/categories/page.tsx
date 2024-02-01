@@ -1,145 +1,217 @@
 'use client';
+import { useState } from 'react';
+
+//chakra
+import {
+  Box,
+  Button,
+  CircularProgress,
+  FormControl,
+  Input,
+  Text,
+  useDisclosure
+} from '@chakra-ui/react';
+
+//component
 import DeleteButton from 'src/components/DeleteButton';
 import UserTabs from 'src/components/layout/UserTabs';
-import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
-import { Box } from '@chakra-ui/react';
 
-const CategoriesPage = () => {
-  const [categoryName, setCategoryName] = useState('');
-  const [categories, setCategories] = useState([]);
+//Modal
+import ModalDelete from 'src/components/category/ModalDelete';
+import ModalUpdate from 'src/components/category/ModalUpdate';
+
+//toast
+import toast from 'react-hot-toast';
+
+//redux
+import {
+  useGetCategoriesQuery,
+  useCreateCategoryMutation,
+  useDeleteCategoryMutation,
+  useUpdateCategoryMutation
+} from 'src/redux/services/categoryApi';
+import { ICategory } from 'src/interfaces';
+
+interface ItemCategoryProps {
+  category: ICategory;
+}
+
+const ItemCategory = (props: ItemCategoryProps) => {
+  const { category } = props;
+  const {
+    isOpen: isOpenDelete,
+    onOpen: onOpenDelete,
+    onClose: onCloseDelete
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenUpdate,
+    onOpen: onOpenUpdate,
+    onClose: onCloseUpdate
+  } = useDisclosure();
+
   const [editedCategory, setEditedCategory] = useState<any>(null);
 
-  // useEffect(() => {
-  //   fetchCategories();
-  // }, []);
+  const [updateCategory, { isLoading: loadingUpdate }] =
+    useUpdateCategoryMutation();
+  const [deleteCategory, { isLoading: loadingDelete }] =
+    useDeleteCategoryMutation();
 
-  // function fetchCategories() {
-  //   fetch('/api/categories').then(res => {
-  //     res.json().then(categories => {
-  //       setCategories(categories);
-  //     });
-  //   });
-  // }
+  const handleUpdateCategory = async (data: ICategory) => {
+    await updateCategory(data)
+      .unwrap()
+      .then(res => {
+        toast.success(`Update category ${res.name} successfully`);
+        onCloseUpdate();
+      })
+      .catch(e => {
+        const message = e.data.message;
+        switch (message) {
+          case 'category already exists':
+            toast.error('Category already exists');
+            break;
+          default:
+            break;
+        }
+      });
+  };
 
-  async function handleCategorySubmit(ev: any) {
-    ev.preventDefault();
-    // const creationPromise = new Promise(async (resolve, reject) => {
-    //   const data: any = { name: categoryName };
-    //   if (editedCategory) {
-    //     data._id = editedCategory._id;
-    //   }
-    //   const response = await fetch('/api/categories', {
-    //     method: editedCategory ? 'PUT' : 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(data)
-    //   });
-    //   setCategoryName('');
-    //   fetchCategories();
-    //   setEditedCategory(null);
-    //   if (response.ok) resolve();
-    //   else reject();
-    // });
-    // await toast.promise(creationPromise, {
-    //   loading: editedCategory
-    //     ? 'Updating category...'
-    //     : 'Creating your new category...',
-    //   success: editedCategory ? 'Category updated' : 'Category created',
-    //   error: 'Error, sorry...'
-    // });
-  }
+  const handleDeleteCategory = async (id: string, name: string) => {
+    if (id) {
+      await deleteCategory(id)
+        .unwrap()
+        .then(res => {
+          toast.success(`Create category ${name} successfully`);
+          onCloseDelete();
+        })
+        .catch(e => {
+          const message = e.data.message;
+          switch (message) {
+            case 'category already exists':
+              toast.error('Category already exists');
+              break;
+            default:
+              break;
+          }
+        });
+    }
+  };
 
-  async function handleDeleteClick(_id: string) {
-    // const promise = new Promise(async (resolve, reject) => {
-    //   const response = await fetch('/api/categories?_id=' + _id, {
-    //     method: 'DELETE'
-    //   });
-    //   if (response.ok) {
-    //     resolve();
-    //   } else {
-    //     reject();
-    //   }
-    // });
-    // await toast.promise(promise, {
-    //   loading: 'Deleting...',
-    //   success: 'Deleted',
-    //   error: 'Error'
-    // });
-    // fetchCategories();
-  }
+  return (
+    <Box
+      key={category._id}
+      className="bg-gray-100 rounded-xl p-2 px-4 flex gap-1 mb-1 items-center"
+    >
+      <Box className="grow">{category.name}</Box>
+      <Box className="flex gap-1">
+        <Button
+          className="hover:bg-gray-400"
+          type="button"
+          onClick={() => {
+            setEditedCategory(category.name);
+            onOpenUpdate();
+          }}
+        >
+          {loadingUpdate ? <CircularProgress size="24px" /> : <Text>Edit</Text>}
+        </Button>
+        <ModalUpdate
+          isOpen={isOpenUpdate}
+          onClose={onCloseUpdate}
+          handleUpdateCategory={() => {
+            handleUpdateCategory({ _id: category._id, name: editedCategory });
+          }}
+          editedCategory={editedCategory}
+          setEditedCategory={setEditedCategory}
+        />
+        <Box>
+          <Button
+            className="hover:bg-gray-400"
+            type="button"
+            onClick={onOpenDelete}
+          >
+            {loadingDelete ? (
+              <CircularProgress size="24px" />
+            ) : (
+              <Text>Delete</Text>
+            )}
+          </Button>
+          <ModalDelete
+            isOpen={isOpenDelete}
+            onClose={onCloseDelete}
+            handleDeleteCategory={() => {
+              handleDeleteCategory(category._id!, category.name);
+            }}
+          />
+        </Box>
+      </Box>
+    </Box>
+  );
+};
 
-  // if (profileLoading) {
-  //   return 'Loading user info...';
-  // }
+const CategoriesPage = () => {
+  const [categoryName, setCategoryName] = useState<string>('');
 
-  // if (!profileData.admin) {
-  //   return 'Not an admin';
-  // }
+  const [createCategory, { isLoading: loadingCreate }] =
+    useCreateCategoryMutation();
+
+  const { data: categories } = useGetCategoriesQuery();
+
+  const handleCreateCategory = async (e: any) => {
+    e.preventDefault();
+    if (categoryName) {
+      const data: ICategory = { name: categoryName };
+      await createCategory(data)
+        .unwrap()
+        .then(res => {
+          setCategoryName('');
+          toast.success(`Create category ${res.name} successfully`);
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    }
+  };
 
   return (
     <section className="mt-8 max-w-2xl mx-auto">
       <Box>
         <UserTabs isAdmin={true} />
-        <form className="mt-8" onSubmit={handleCategorySubmit}>
-          <div className="flex gap-2 items-end">
-            <div className="grow">
-              <label>
-                {editedCategory ? 'Update category' : 'New category name'}
-                {editedCategory && (
-                  <>
-                    : <b>{editedCategory.name}</b>
-                  </>
-                )}
-              </label>
-              <input
+        <FormControl as="form" className="mt-8" onSubmit={handleCreateCategory}>
+          <Box className="flex gap-2 items-end">
+            <Box className="grow">
+              <Input
                 type="text"
                 value={categoryName}
                 onChange={ev => setCategoryName(ev.target.value)}
               />
-            </div>
-            <div className="pb-2 flex gap-2">
-              <button className="border border-primary" type="submit">
-                {editedCategory ? 'Update' : 'Create'}
-              </button>
-              <button
+            </Box>
+            <Box className="pb-2 flex gap-2">
+              <Button className="border border-primary" type="submit">
+                {loadingCreate ? (
+                  <CircularProgress size="24px" />
+                ) : (
+                  <Text>Create</Text>
+                )}
+              </Button>
+              <Button
                 type="button"
                 onClick={() => {
-                  setEditedCategory(null);
-                  setCategoryName('');
+                  categories && setCategoryName('');
                 }}
               >
                 Cancel
-              </button>
-            </div>
-          </div>
-        </form>
-        <div>
+              </Button>
+            </Box>
+          </Box>
+        </FormControl>
+        <Box>
           <h2 className="mt-8 text-sm text-gray-500">Existing categories</h2>
-          {categories?.length > 0 &&
-            categories.map((c: any) => (
-              <div
-                key={c._id}
-                className="bg-gray-100 rounded-xl p-2 px-4 flex gap-1 mb-1 items-center"
-              >
-                <div className="grow">{c.name}</div>
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditedCategory(c);
-                      setCategoryName(c.name);
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <DeleteButton
-                    label="Delete"
-                    onDelete={() => handleDeleteClick(c._id)}
-                  />
-                </div>
-              </div>
+          {categories &&
+            categories?.length > 0 &&
+            categories.map((category: ICategory) => (
+              <ItemCategory category={category} />
             ))}
-        </div>
+        </Box>
       </Box>
     </section>
   );
